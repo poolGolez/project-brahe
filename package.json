@@ -1,0 +1,28 @@
+{
+  "name": "project-brahe",
+  "version": "1.0.0",
+  "description": "An Ethereum DApp for event staking",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/poolGolez/project-brahe.git"
+  },
+  "keywords": [
+    "ethereum",
+    "solidity",
+    "web3",
+    "dapp"
+  ],
+  "author": "Pool Golez",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/poolGolez/project-brahe/issues"
+  },
+  "homepage": "https://github.com/poolGolez/project-brahe#readme",
+  "dependencies": {
+    "solc": "^0.8.11"
+  }
+}
