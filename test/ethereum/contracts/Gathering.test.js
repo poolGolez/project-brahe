@@ -37,6 +37,9 @@ describe('Gathering', () => {
         let gathering;
         beforeEach(async () => {
             gathering = await createGathering('JS Summit 2022', 12);
+            await gathering.methods
+                .openInvitation()
+                .send({ from: manager });
         });
 
         it('should register the participant', async () => {
