@@ -50,6 +50,43 @@ describe('Gathering', () => {
             assert.equal(true, await gathering.methods.isParticipant().call({ from: guest1 }));
             assert.equal(1, await gathering.methods.participantsCount().call());
         });
+
+        it('should raise error if participant pays less than the set downpayment', async () => {
+            try {
+                await gathering.methods
+                    .join()
+                    .send({
+                        from: guest1,
+                        value: 10
+                    });
+            } catch (err) {
+                assertError("Insufficient funds to make a downpayment.", err);
+                return;
+            }
+            assert.fail("No error was thrown.");
+        });
+
+        it('should raise error if the participant has already joined', async () => {
+            await gathering.methods
+                .join()
+                .send({
+                    from: guest1,
+                    value: 12
+                });
+
+            try {
+                await gathering.methods
+                    .join()
+                    .send({
+                        from: guest1,
+                        value: 12
+                    });
+            } catch (err) {
+                assertError("Already registered to the gathering.", err);
+                return;
+            }
+            assert.fail("No error was thrown.");
+        });
     });
 
     async function createGathering(name, downpayment) {
@@ -62,5 +99,10 @@ describe('Gathering', () => {
                 from: manager,
                 gas: '1000000'
             });
+    }
+
+    function assertError(message, error) {
+        const key = Object.keys(error.results)[0]
+        assert.equal(message, error.results[key].reason);
     }
 });
