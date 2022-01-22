@@ -8,7 +8,7 @@ contract Gathering {
     string public name;
     uint public downpayment;
 
-    mapping(address => bool) participants;
+    mapping(address => bool) public participants;
     uint public participantsCount;
 
     constructor(string memory _name, uint _downpayment) {
@@ -30,5 +30,9 @@ contract Gathering {
 
         participants[msg.sender] = true;
         participantsCount++;
+    }
+
+    function isParticipant() public view returns(bool) {
+        return participants[msg.sender];
     }
 }
