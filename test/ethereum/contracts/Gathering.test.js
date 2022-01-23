@@ -43,8 +43,12 @@ describe('Gathering', () => {
         });
 
         describe('openInvitation', () => {
-            it('openInvitation should change the status: INITIALIZED => INVITATION_OPEN', async () => {
-                const gathering = await _createGathering();
+            let gathering;
+            beforeEach(async () => {
+                gathering = await _createGathering();
+            });
+
+            it('should change the status: INITIALIZED => INVITATION_OPEN', async () => {
                 await gathering.methods
                     .openInvitation()
                     .send({ from: manager });
@@ -52,8 +56,7 @@ describe('Gathering', () => {
                 assert.strictEqual(await gathering.methods.status().call(), 'INVITATION_OPEN');
             });
 
-            it('openInvitation should raise error if NOT called by a manager', async () => {
-                const gathering = await _createGathering();
+            it('should raise error if NOT called by a manager', async () => {
                 await _assertErrorThrown(async () => {
                     await gathering.methods
                         .openInvitation()
@@ -62,8 +65,7 @@ describe('Gathering', () => {
                 }, "Operation is restricted to the manager only.");
             });
 
-            it('openInvitation should raise error if the current status is not INITIALIZED', async () => {
-                const gathering = await _createGathering();
+            it('should raise error if the current status is not INITIALIZED', async () => {
                 await gathering.methods
                     .openInvitation()
                     .send({ from: manager });
@@ -71,6 +73,46 @@ describe('Gathering', () => {
                 await _assertErrorThrown(async () => {
                     await gathering.methods
                         .openInvitation()
+                        .send({ from: manager });
+
+                }, "Can't perform operation with the current status.");
+            });
+        });
+
+        describe('closeInvitation', () => {
+            let gathering;
+            beforeEach(async () => {
+                gathering = await _createGathering();
+                await gathering.methods
+                    .openInvitation()
+                    .send({ from: manager });
+            });
+
+            it('should change the status: INVITATION_OPEN => INVITATION_CLOSED', async () => {
+                await gathering.methods
+                    .closeInvitation()
+                    .send({ from: manager });
+
+                assert.strictEqual(await gathering.methods.status().call(), 'INVITATION_CLOSED');
+            });
+
+            it('should raise error if NOT called by a manager', async () => {
+                await _assertErrorThrown(async () => {
+                    await gathering.methods
+                        .closeInvitation()
+                        .send({ from: guest1 });
+
+                }, "Operation is restricted to the manager only.");
+            });
+
+            it('should raise error if the current status is not INVITATION_OPEN', async () => {
+                await gathering.methods
+                    .closeInvitation()
+                    .send({ from: manager });
+
+                await _assertErrorThrown(async () => {
+                    await gathering.methods
+                        .closeInvitation()
                         .send({ from: manager });
 
                 }, "Can't perform operation with the current status.");
