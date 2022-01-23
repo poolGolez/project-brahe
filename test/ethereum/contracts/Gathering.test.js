@@ -17,19 +17,19 @@ describe('Gathering', () => {
         it('should set the name of the gathering', async () => {
             const gathering = await createGathering('Ethereum Summit 2021', 25);
 
-            assert.equal('Ethereum Summit 2021', await gathering.methods.name().call());
+            assert.strictEqual('Ethereum Summit 2021', await gathering.methods.name().call());
         });
 
         it('should set the downpayment of the gathering', async () => {
             const gathering = await createGathering('Ethereum Summit 2021', 25);
 
-            assert.equal(25, await gathering.methods.downpayment().call());
+            assert.strictEqual('25', await gathering.methods.downpayment().call());
         });
 
         it('should set the sender as the manager of the gathering', async () => {
             const gathering = await createGathering('Ethereum Summit 2021', 25);
 
-            assert.equal(manager, await gathering.methods.manager().call());
+            assert.strictEqual(manager, await gathering.methods.manager().call());
         });
     });
 
@@ -50,8 +50,8 @@ describe('Gathering', () => {
                     value: 12
                 });
 
-            assert.equal(true, await gathering.methods.isParticipant().call({ from: guest1 }));
-            assert.equal(1, await gathering.methods.participantsCount().call());
+            assert.strictEqual(true, await gathering.methods.isParticipant().call({ from: guest1 }));
+            assert.strictEqual('1', await gathering.methods.participantsCount().call());
         });
 
         it('should raise error if participant pays less than the set downpayment', async () => {
@@ -106,6 +106,6 @@ describe('Gathering', () => {
 
     function assertError(message, error) {
         const key = Object.keys(error.results)[0]
-        assert.equal(message, error.results[key].reason);
+        assert.strictEqual(message, error.results[key].reason);
     }
 });
