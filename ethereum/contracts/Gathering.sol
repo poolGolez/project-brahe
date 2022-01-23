@@ -3,19 +3,10 @@
 pragma solidity ^0.8.11;
 
 contract Gathering {
-    enum Status {
-        INITIALIZED,
-        INVITATION_OPEN,
-        INVITATION_CLOSED,
-        REGISTRATION_OPEN,
-        REGISTRATION_CLOSED,
-        CLOSED
-    }
-
     address public manager;
     string public name;
     uint256 public downpayment;
-    Status public status;
+    string public status;
 
     mapping(address => bool) participants;
     uint256 public participantsCount;
@@ -24,14 +15,14 @@ contract Gathering {
         manager = msg.sender;
         name = _name;
         downpayment = _downpayment;
-        status = Status.INITIALIZED;
+        status = "INITIALIZED";
     }
 
-    function openInvitation() public managerOnly atStatus(Status.INITIALIZED) {
-        status = Status.INVITATION_OPEN;
+    function openInvitation() public managerOnly atStatus("INITIALIZED") {
+        status = "INVITATION_OPEN";
     }
 
-    function join() public payable atStatus(Status.INVITATION_OPEN) {
+    function join() public payable atStatus("INVITATION_OPEN") {
         require(
             msg.value >= downpayment,
             "Insufficient funds to make a downpayment."
@@ -50,12 +41,8 @@ contract Gathering {
         return participants[msg.sender];
     }
 
-    function closeInvitation()
-        public
-        managerOnly
-        atStatus(Status.INVITATION_OPEN)
-    {
-        status = Status.INVITATION_CLOSED;
+    function closeInvitation() public managerOnly atStatus("INVITATION_OPEN") {
+        status = "INVITATION_CLOSED";
     }
 
     modifier managerOnly() {
@@ -66,9 +53,10 @@ contract Gathering {
         _;
     }
 
-    modifier atStatus(Status _status) {
+    modifier atStatus(string memory _status) {
         require(
-            status == _status,
+            keccak256(abi.encodePacked(status)) ==
+                keccak256(abi.encodePacked(_status)),
             "Can't perform operation with the current status"
         );
 
