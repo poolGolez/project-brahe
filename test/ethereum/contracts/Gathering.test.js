@@ -3,6 +3,7 @@ const Web3 = require('web3');
 const assert = require('assert');
 
 const compiledGathering = require('../../../ethereum/build/Gathering.json');
+let Gathering;
 let web3;
 let manager;
 let guest1;
@@ -11,32 +12,76 @@ describe('Gathering', () => {
     beforeEach(async () => {
         web3 = new Web3(ganache.provider());
         [manager, guest1] = await web3.eth.getAccounts();
+        Gathering = await new web3.eth.Contract(compiledGathering.abi);
     });
 
     describe('initialization', () => {
         it('should set the name of the gathering', async () => {
-            const gathering = await createGathering('Ethereum Summit 2021', 25);
+            const gathering = await _createGathering('Ethereum Summit 2021', 25);
 
-            assert.strictEqual('Ethereum Summit 2021', await gathering.methods.name().call());
+            assert.strictEqual(await gathering.methods.name().call(), 'Ethereum Summit 2021');
         });
 
         it('should set the downpayment of the gathering', async () => {
-            const gathering = await createGathering('Ethereum Summit 2021', 25);
+            const gathering = await _createGathering('Ethereum Summit 2021', 25);
 
-            assert.strictEqual('25', await gathering.methods.downpayment().call());
+            assert.strictEqual(await gathering.methods.downpayment().call(), '25');
         });
 
         it('should set the sender as the manager of the gathering', async () => {
-            const gathering = await createGathering('Ethereum Summit 2021', 25);
+            const gathering = await _createGathering('Ethereum Summit 2021', 25);
 
-            assert.strictEqual(manager, await gathering.methods.manager().call());
+            assert.strictEqual(await gathering.methods.manager().call(), manager);
+        });
+    });
+
+    describe('state management', () => {
+        it('should start at INITIALIZED state', async () => {
+            const gathering = await _createGathering();
+
+            assert.strictEqual(await gathering.methods.status().call(), 'INITIALIZED');
+        });
+
+        describe('openInvitation', () => {
+            it('openInvitation should change the status: INITIALIZED => INVITATION_OPEN', async () => {
+                const gathering = await _createGathering();
+                await gathering.methods
+                    .openInvitation()
+                    .send({ from: manager });
+
+                assert.strictEqual(await gathering.methods.status().call(), 'INVITATION_OPEN');
+            });
+
+            it('openInvitation should raise error if NOT called by a manager', async () => {
+                const gathering = await _createGathering();
+                await _assertErrorThrown(async () => {
+                    await gathering.methods
+                        .openInvitation()
+                        .send({ from: guest1 });
+
+                }, "Operation is restricted to the manager only.");
+            });
+
+            it('openInvitation should raise error if the current status is not INITIALIZED', async () => {
+                const gathering = await _createGathering();
+                await gathering.methods
+                    .openInvitation()
+                    .send({ from: manager });
+
+                await _assertErrorThrown(async () => {
+                    await gathering.methods
+                        .openInvitation()
+                        .send({ from: manager });
+
+                }, "Can't perform operation with the current status.");
+            });
         });
     });
 
     describe('join', () => {
         let gathering;
         beforeEach(async () => {
-            gathering = await createGathering('JS Summit 2022', 12);
+            gathering = await _createGathering('JS Summit 2022', 12);
             await gathering.methods
                 .openInvitation()
                 .send({ from: manager });
@@ -50,23 +95,19 @@ describe('Gathering', () => {
                     value: 12
                 });
 
-            assert.strictEqual(true, await gathering.methods.isParticipant().call({ from: guest1 }));
-            assert.strictEqual('1', await gathering.methods.participantsCount().call());
+            assert.strictEqual(await gathering.methods.isParticipant().call({ from: guest1 }), true);
+            assert.strictEqual(await gathering.methods.participantsCount().call(), '1');
         });
 
         it('should raise error if participant pays less than the set downpayment', async () => {
-            try {
+            await _assertErrorThrown(async () => {
                 await gathering.methods
                     .join()
                     .send({
                         from: guest1,
                         value: 10
                     });
-            } catch (err) {
-                assertError("Insufficient funds to make a downpayment.", err);
-                return;
-            }
-            assert.fail("No error was thrown.");
+            }, "Insufficient funds to make a downpayment.");
         });
 
         it('should raise error if the participant has already joined', async () => {
@@ -77,23 +118,21 @@ describe('Gathering', () => {
                     value: 12
                 });
 
-            try {
+            await _assertErrorThrown(async () => {
                 await gathering.methods
                     .join()
                     .send({
                         from: guest1,
                         value: 12
                     });
-            } catch (err) {
-                assertError("Already registered to the gathering.", err);
-                return;
-            }
-            assert.fail("No error was thrown.");
+            }, "Already registered to the gathering.");
         });
     });
 
-    async function createGathering(name, downpayment) {
-        return await new web3.eth.Contract(compiledGathering.abi)
+    async function _createGathering(name, downpayment) {
+        name = name || 'JS Summit';
+        downpayment = downpayment || 12;
+        return await Gathering
             .deploy({
                 data: compiledGathering.evm.bytecode.object,
                 arguments: [name, downpayment]
@@ -104,8 +143,18 @@ describe('Gathering', () => {
             });
     }
 
-    function assertError(message, error) {
-        const key = Object.keys(error.results)[0]
-        assert.strictEqual(message, error.results[key].reason);
+    async function _assertErrorThrown(fn, errorMessage) {
+        try {
+            await fn();
+        } catch (err) {
+            _assertError(errorMessage, err);
+            return;
+        }
+        assert.fail("No error was thrown.");
+    }
+
+    function _assertError(message, error) {
+        const key = Object.keys(error.results)[0];
+        assert.strictEqual(error.results[key].reason, message);
     }
 });
