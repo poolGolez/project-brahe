@@ -48,7 +48,7 @@ contract Gathering {
     modifier managerOnly() {
         require(
             msg.sender == manager,
-            "Operation is restricted to the manager only"
+            "Operation is restricted to the manager only."
         );
         _;
     }
@@ -57,7 +57,7 @@ contract Gathering {
         require(
             keccak256(abi.encodePacked(status)) ==
                 keccak256(abi.encodePacked(_status)),
-            "Can't perform operation with the current status"
+            "Can't perform operation with the current status."
         );
 
         _;
