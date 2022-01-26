@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Container, Card } from "semantic-ui-react";
+import { Container, Card, Menu, Image, Icon } from "semantic-ui-react";
 import 'semantic-ui-css/semantic.min.css';
 import GatheringCard from "../components/GatheringCard"
 
@@ -33,20 +33,40 @@ class EventsListPage extends Component {
             },
         ];
         return (
-            <Container>
-                <Card.Group itemsPerRow={3}>
-                    {
-                        gatherings.map((g) => {
-                            return <GatheringCard
-                                id={g.id}
-                                header={g.header}
-                                participantsCount={g.participantsCount}
-                                balance={g.balance}
-                            />;
-                        })
-                    }
-                </Card.Group>
-            </Container>
+            <Container fluid>
+                <Menu borderless>
+                    <Menu.Item>
+                        <Image src='https://react.semantic-ui.com/logo.png' size='mini' />
+                    </Menu.Item>
+                    <Menu.Item header>
+                        Project Brahe
+                    </Menu.Item>
+
+                    <Menu.Menu position='right'>
+                        <Menu.Item>
+                            <Icon name="plus" />
+                            Create Gathering
+                        </Menu.Item>
+                    </Menu.Menu>
+
+                </Menu>
+
+
+                <Container>
+                    <Card.Group itemsPerRow={3}>
+                        {
+                            gatherings.map((g) => {
+                                return <GatheringCard
+                                    id={g.id}
+                                    header={g.header}
+                                    participantsCount={g.participantsCount}
+                                    balance={g.balance}
+                                />;
+                            })
+                        }
+                    </Card.Group>
+                </Container>
+            </Container >
         );
     }
 }
