@@ -17,19 +17,19 @@ describe('Gathering', () => {
 
     describe('initialization', () => {
         it('should set the name of the gathering', async () => {
-            const gathering = await _createGathering('Ethereum Summit 2021', 25);
+            const gathering = await _createGathering(manager, 'Ethereum Summit 2021', 25);
 
             assert.strictEqual(await gathering.methods.name().call(), 'Ethereum Summit 2021');
         });
 
         it('should set the downpayment of the gathering', async () => {
-            const gathering = await _createGathering('Ethereum Summit 2021', 25);
+            const gathering = await _createGathering(manager, 'Ethereum Summit 2021', 25);
 
             assert.strictEqual(await gathering.methods.downpayment().call(), '25');
         });
 
         it('should set the sender as the manager of the gathering', async () => {
-            const gathering = await _createGathering('Ethereum Summit 2021', 25);
+            const gathering = await _createGathering(manager, 'Ethereum Summit 2021', 25);
 
             assert.strictEqual(await gathering.methods.manager().call(), manager);
         });
@@ -171,13 +171,14 @@ describe('Gathering', () => {
         });
     });
 
-    async function _createGathering(name, downpayment) {
+    async function _createGathering(managerAddress, name, downpayment) {
+        managerAddress = managerAddress || manager;
         name = name || 'JS Summit';
         downpayment = downpayment || 12;
         return await Gathering
             .deploy({
                 data: compiledGathering.evm.bytecode.object,
-                arguments: [name, downpayment]
+                arguments: [manager, name, downpayment]
             })
             .send({
                 from: manager,
