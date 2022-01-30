@@ -11,8 +11,12 @@ contract Gathering {
     mapping(address => bool) participants;
     uint256 public participantsCount;
 
-    constructor(string memory _name, uint256 _downpayment) {
-        manager = msg.sender;
+    constructor(
+        address _manager,
+        string memory _name,
+        uint256 _downpayment
+    ) {
+        manager = _manager;
         name = _name;
         downpayment = _downpayment;
         status = "INITIALIZED";
