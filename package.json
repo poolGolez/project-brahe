@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/poolGolez/project-brahe#readme",
   "dependencies": {
+    "@truffle/hdwallet-provider": "^2.0.0",
     "fs-extra": "^10.0.0",
     "ganache": "^7.0.0",
     "ganache-cli": "^6.12.2",
