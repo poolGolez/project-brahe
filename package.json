@@ -6,6 +6,7 @@
   "scripts": {
     "test": "mocha --recursive",
     "compile": "node ethereum/compile.js",
+    "deploy": "node ethereum/deploy.js",
     "dev": "next dev"
   },
   "repository": {
