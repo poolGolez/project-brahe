@@ -49,6 +49,28 @@ contract Gathering {
         status = "INVITATION_CLOSED";
     }
 
+    function getDetails()
+        external
+        view
+        returns (
+            string memory,
+            uint256,
+            string memory,
+            address,
+            uint256,
+            uint256
+        )
+    {
+        return (
+            name,
+            downpayment,
+            status,
+            manager,
+            address(this).balance,
+            participantsCount
+        );
+    }
+
     modifier managerOnly() {
         require(
             msg.sender == manager,
