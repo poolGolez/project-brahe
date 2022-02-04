@@ -1,10 +1,9 @@
 import Link from "next/link";
 import { Component } from "react";
-import { Button, Card, Container, Icon, Statistic } from "semantic-ui-react";
+import { Card, Container, Icon, Statistic } from "semantic-ui-react";
 
 class GatheringCard extends Component {
     render() {
-        console.log("props:", this.props);
         return (
             <Link href={`/gatherings/${this.props.id}`}>
                 <Card>
@@ -16,7 +15,7 @@ class GatheringCard extends Component {
                         <Container textAlign='right'>
                             <Statistic>
                                 <Statistic.Value>{this.props.participantsCount}</Statistic.Value>
-                                <Statistic.Label>Registrars</Statistic.Label>
+                                <Statistic.Label>Registrants</Statistic.Label>
                             </Statistic>
                         </Container>
                     </Card.Content>

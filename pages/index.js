@@ -1,57 +1,99 @@
 import React, { Component } from "react";
-import { Container, Card} from "semantic-ui-react";
-import Header from "../components/Header";
+import { Container, Card, Segment, Dimmer, Loader, Placeholder } from "semantic-ui-react";
 import 'semantic-ui-css/semantic.min.css';
 import GatheringCard from "../components/GatheringCard"
+import { GatheringFactory, Gathering } from "../ethereum/factory";
+import web3 from "../ethereum/web3";
+import Layout from "../components/Layout";
 
 class EventsListPage extends Component {
 
+    state = {
+        loaded: false,
+        gatherings: []
+    };
+
+    async componentDidMount() {
+        const loaded = true;
+
+        const gathering_ids = await GatheringFactory.methods.getGatherings().call();
+        this.setState({ loaded });
+
+        const getDetailsPromises = gathering_ids.map((id) => {
+            return Gathering(id).methods.getDetails().call();
+        });
+
+        const gatherings_data = await Promise.all(getDetailsPromises);
+        const gatherings = gatherings_data.map((gathering) => {
+            return {
+                name: gathering[0],
+                downpayment: parseInt(gathering[1]),
+                status: gathering[2],
+                managerAddress: gathering[3],
+                balance: web3.utils.fromWei(gathering[4], 'ether'),
+                participantsCount: gathering[5]
+            };
+        });
+        this.setState({ gatherings });
+    }
+
     render() {
-        const gatherings = [
-            {
-                id: 1,
-                header: "JS Summit 2019",
-                participantsCount: 748,
-                balance: 0.757
-            },
-            {
-                id: 2,
-                header: "JS Summit 2020",
-                participantsCount: 881,
-                balance: 0.957
-            },
-            {
-                id: 3,
-                header: "JS Summit 2020",
-                participantsCount: 1191,
-                balance: 1.084
-            },
-            {
-                id: 4,
-                header: "JS Summit 2021",
-                participantsCount: 357,
-                balance: 0.027
-            },
-        ];
-        return (
-            <Container fluid>
-                <Header/>
-                <Container>
-                    <Card.Group itemsPerRow={3}>
-                        {
-                            gatherings.map((g) => {
-                                return <GatheringCard
-                                    id={g.id}
-                                    header={g.header}
-                                    participantsCount={g.participantsCount}
-                                    balance={g.balance}
-                                />;
-                            })
-                        }
-                    </Card.Group>
-                </Container>
-            </Container >
-        );
+        if (this.state.loaded) {
+            return (
+                <Layout>
+                    <Container>
+                        <Card.Group itemsPerRow={3}>
+                            {
+                                this.state.gatherings.map((gathering, index) => {
+                                    return <GatheringCard
+                                        key={index}
+                                        id={gathering.id}
+                                        header={gathering.name}
+                                        participantsCount={gathering.participantsCount}
+                                        balance={gathering.balance}
+                                    />;
+                                })
+                            }
+                        </Card.Group>
+                    </Container>
+                </Layout>
+            );
+        } else {
+            return (
+                <Layout>
+                    <Container>
+                        <Dimmer.Dimmable as={Segment}>
+                            <Card.Group itemsPerRow={3}>
+                                {
+                                    Array(3).fill().map((_, index) => {
+                                        return (
+                                            <Card key={index}>
+                                                <Card.Content>
+                                                    <Placeholder>
+                                                        <Placeholder.Header>
+                                                            <Placeholder.Line length='long' />
+                                                            <Placeholder.Line length='full' />
+                                                            <Placeholder.Line length='full' />
+                                                        </Placeholder.Header>
+                                                        <Placeholder.Paragraph>
+                                                            <Placeholder.Line length='long' />
+                                                            <Placeholder.Line length='medium' />
+                                                        </Placeholder.Paragraph>
+                                                    </Placeholder>
+                                                </Card.Content>
+                                            </Card>
+                                        );
+                                    })
+                                }
+                            </Card.Group>
+                            <Dimmer active inverted>
+                                <Loader indeterminate>Retrieving Gatherings</Loader>
+                            </Dimmer>
+                        </Dimmer.Dimmable>
+                    </Container>
+                </Layout>
+            );
+        }
     }
 }
 
