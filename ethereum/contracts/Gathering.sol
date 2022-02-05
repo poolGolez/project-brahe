@@ -9,7 +9,7 @@ contract Gathering {
     string public status;
 
     mapping(address => bool) participants;
-    uint256 public participantsCount;
+    uint16 public participantsCount;
 
     constructor(
         address _manager,
@@ -20,6 +20,7 @@ contract Gathering {
         name = _name;
         downpayment = _downpayment;
         status = "INITIALIZED";
+        participantsCount = 0;
     }
 
     function openInvitation() public managerOnly atStatus("INITIALIZED") {
@@ -58,7 +59,7 @@ contract Gathering {
             string memory,
             address,
             uint256,
-            uint256
+            uint16
         )
     {
         return (
