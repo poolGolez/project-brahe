@@ -24,8 +24,9 @@ class EventsListPage extends Component {
         });
 
         const gatherings_data = await Promise.all(getDetailsPromises);
-        const gatherings = gatherings_data.map((gathering) => {
+        const gatherings = gatherings_data.map((gathering, index) => {
             return {
+                address: gathering_ids[index],
                 name: gathering[0],
                 downpayment: parseInt(gathering[1]),
                 status: gathering[2],
@@ -45,13 +46,15 @@ class EventsListPage extends Component {
                         <Card.Group itemsPerRow={3}>
                             {
                                 this.state.gatherings.map((gathering, index) => {
-                                    return <GatheringCard
-                                        key={index}
-                                        id={gathering.id}
-                                        header={gathering.name}
-                                        participantsCount={gathering.participantsCount}
-                                        balance={gathering.balance}
-                                    />;
+                                    return (
+                                        <GatheringCard
+                                            key={index}
+                                            address={gathering.address}
+                                            header={gathering.name}
+                                            participantsCount={gathering.participantsCount}
+                                            balance={gathering.balance}
+                                        />
+                                    );
                                 })
                             }
                         </Card.Group>

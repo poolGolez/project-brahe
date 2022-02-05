@@ -3,8 +3,9 @@ import { Component } from "react";
 class GatheringsShowPage extends Component {
 
     static getInitialProps(props) {
-        console.log("Props:", props.query);
-        return {};
+        return {
+            address: props.query.address
+        };
     }
 
     componentDidMount() {
