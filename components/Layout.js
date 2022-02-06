@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Container } from "semantic-ui-react";
 import LayoutHeader from "./LayoutHeader";
+import 'semantic-ui-css/semantic.min.css';
 
 class Layout extends Component {
 

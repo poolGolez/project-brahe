@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { Container, Card, Segment, Dimmer, Loader, Placeholder } from "semantic-ui-react";
-import 'semantic-ui-css/semantic.min.css';
 import GatheringCard from "../components/GatheringCard"
 import { GatheringFactory, Gathering } from "../ethereum/factory";
 import web3 from "../ethereum/web3";
