@@ -3,9 +3,9 @@
 pragma solidity ^0.8.11;
 
 contract Gathering {
-
     struct Participant {
         string name;
+        uint256 signupDate;
     }
 
     address public manager;
@@ -34,7 +34,11 @@ contract Gathering {
         status = "INVITATION_OPEN";
     }
 
-    function join(string memory _name) public payable atStatus("INVITATION_OPEN") {
+    function join(string memory _name)
+        public
+        payable
+        atStatus("INVITATION_OPEN")
+    {
         require(
             msg.value >= downpayment,
             "Insufficient funds to make a downpayment."
@@ -48,7 +52,10 @@ contract Gathering {
         participants[msg.sender] = true;
         participantsCount++;
 
-        participantsMapping[msg.sender] = Participant({ name: _name });
+        participantsMapping[msg.sender] = Participant({
+            name: _name,
+            signupDate: block.timestamp
+        });
         participantIds.push(msg.sender);
     }
 
@@ -87,7 +94,6 @@ contract Gathering {
             participantsCount
         );
     }
-
 
     modifier managerOnly() {
         require(
