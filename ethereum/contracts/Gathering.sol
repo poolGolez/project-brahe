@@ -63,12 +63,6 @@ contract Gathering {
         return participants[msg.sender];
     }
 
-    function getParticipants() public view returns (Participant[] memory) {
-        Participant[] memory results = new Participant[](participantIds.length);
-
-        return results;
-    }
-
     function closeInvitation() public managerOnly atStatus("INVITATION_OPEN") {
         status = "INVITATION_CLOSED";
     }
