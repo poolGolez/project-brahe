@@ -3,11 +3,10 @@
 pragma solidity ^0.8.11;
 
 contract Gathering {
-
     struct Participant {
         string name;
-        uint signupDate;
-        bool attended
+        uint256 signupDate;
+        bool attended;
     }
 
     address public manager;
@@ -15,10 +14,8 @@ contract Gathering {
     uint256 public downpayment;
     string public status;
 
-    mapping(address => bool) participants;
     mapping(address => Participant) public participantsMapping;
     address[] public participantIds;
-    uint16 public participantsCount;
 
     constructor(
         address _manager,
@@ -29,36 +26,33 @@ contract Gathering {
         name = _name;
         downpayment = _downpayment;
         status = "INITIALIZED";
-        participantsCount = 0;
     }
 
     function openInvitation() public managerOnly atStatus("INITIALIZED") {
         status = "INVITATION_OPEN";
     }
 
-    function join(string memory _name) public payable atStatus("INVITATION_OPEN") {
+    function join(string memory _name)
+        public
+        payable
+        atStatus("INVITATION_OPEN")
+    {
         require(
             msg.value >= downpayment,
             "Insufficient funds to make a downpayment."
         );
 
         require(
-            !participants[msg.sender],
+            participantsMapping[msg.sender].signupDate == 0,
             "Already registered to the gathering."
         );
 
-        participants[msg.sender] = true;
-        participantsCount++;
-
         participantsMapping[msg.sender] = Participant({
             name: _name,
-            signupDate: block.timestamp
+            signupDate: block.timestamp,
+            attended: false
         });
         participantIds.push(msg.sender);
-    }
-
-    function isParticipant() public view returns (bool) {
-        return participants[msg.sender];
     }
 
     function closeInvitation() public managerOnly atStatus("INVITATION_OPEN") {
@@ -74,7 +68,7 @@ contract Gathering {
             string memory,
             address,
             uint256,
-            uint16
+            uint256
         )
     {
         return (
@@ -83,10 +77,9 @@ contract Gathering {
             status,
             manager,
             address(this).balance,
-            participantsCount
+            participantIds.length
         );
     }
-
 
     modifier managerOnly() {
         require(
