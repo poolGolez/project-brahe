@@ -1,4 +1,4 @@
-const FACTORY_ADDRESS = '0xb959EBb9f59090CdD123254F88f6cc95528cc9B9';
+const FACTORY_ADDRESS = '0x5ED2ae67bAf35069B14325C88B470d4054eAcB13';
 
 import web3 from './web3';
 const compiledFactory = require('./build/GatheringFactory.json');

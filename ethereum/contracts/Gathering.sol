@@ -81,6 +81,14 @@ contract Gathering {
         );
     }
 
+    function getParticipants() external view returns (Participant[] memory) {
+        Participant[] memory results = new Participant[](participantIds.length);
+        for (uint256 i = 0; i < participantIds.length; i++) {
+            results[i] = participantsMapping[participantIds[i]];
+        }
+        return results;
+    }
+
     modifier managerOnly() {
         require(
             msg.sender == manager,
