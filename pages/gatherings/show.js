@@ -1,6 +1,7 @@
 import { Component, createRef } from "react";
 import { Container, Grid, Header, Segment, Ref, Sticky, Table, Item } from "semantic-ui-react";
 import Layout from "../../components/Layout";
+import { Gathering } from "../../ethereum/factory";
 
 class GatheringsShowPage extends Component {
     state = {
@@ -8,7 +9,8 @@ class GatheringsShowPage extends Component {
             name: 'AWS Conference 2022',
             downpayment: '0.0000000025',
             status: 'INITIALIZED'
-        }
+        },
+        participants: [1, 2]
     }
 
     static getInitialProps(props) {
@@ -17,8 +19,18 @@ class GatheringsShowPage extends Component {
         };
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         console.log("props:", this.props);
+        const gathering = Gathering(this.props.address);
+
+        const gatheringDetails = await gathering.methods.getDetails().call();
+        const name = gatheringDetails[0];
+        const downpayment = parseInt(gatheringDetails[1])
+        const status = gatheringDetails[2];
+
+        this.setState({
+            gathering: { name, downpayment, status }
+        })
     }
 
     contextRef = createRef();
@@ -48,7 +60,7 @@ class GatheringsShowPage extends Component {
                                                         <Table.Cell>Status</Table.Cell>
                                                         <Table.Cell textAlign="right">{this.state.gathering.status}</Table.Cell>
                                                     </Table.Row>
-                                                    <Table.Row borderless>
+                                                    <Table.Row>
                                                         <Table.Cell>Downpayment</Table.Cell>
                                                         <Table.Cell textAlign="right">{this.state.gathering.downpayment}</Table.Cell>
                                                     </Table.Row>
@@ -71,7 +83,7 @@ class GatheringsShowPage extends Component {
                                 </Table.Header>
                                 <Table.Body>
                                     {
-                                        Array(100).fill().map((_, i) => {
+                                        this.state.participants.map((_, i) => {
                                             return (
                                                 <Table.Row key={i}>
                                                     <Table.Cell>Jeshui Laskarov</Table.Cell>
