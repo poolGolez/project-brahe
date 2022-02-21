@@ -1,7 +1,9 @@
+import moment from "moment";
 import { Component, createRef } from "react";
 import { Container, Grid, Header, Segment, Ref, Sticky, Table, Item } from "semantic-ui-react";
 import Layout from "../../components/Layout";
 import { Gathering } from "../../ethereum/factory";
+import web3 from "../../ethereum/web3";
 
 class GatheringsShowPage extends Component {
     state = {
@@ -10,7 +12,7 @@ class GatheringsShowPage extends Component {
             downpayment: '0.0000000025',
             status: 'INITIALIZED'
         },
-        participants: [1, 2]
+        participants: []
     }
 
     static getInitialProps(props) {
@@ -25,11 +27,14 @@ class GatheringsShowPage extends Component {
 
         const gatheringDetails = await gathering.methods.getDetails().call();
         const name = gatheringDetails[0];
-        const downpayment = parseInt(gatheringDetails[1])
+        const downpayment = web3.utils.fromWei(gatheringDetails[1], 'ether');
         const status = gatheringDetails[2];
 
+        const participants = await gathering.methods.getParticipants().call();
+
         this.setState({
-            gathering: { name, downpayment, status }
+            gathering: { name, downpayment, status },
+            participants
         })
     }
 
@@ -40,7 +45,7 @@ class GatheringsShowPage extends Component {
                 <Container>
                     <Grid>
                         <Ref innerRef={this.contextRef}>
-                            <Grid.Column width={4}>
+                            <Grid.Column width={5}>
                                 <Sticky context={this.contextRef}>
                                     <Segment.Group>
                                         <Segment>
@@ -48,20 +53,15 @@ class GatheringsShowPage extends Component {
                                                 {this.state.gathering.name}
                                             </Header>
                                         </Segment>
-                                        <Segment>ASDF</Segment>
                                         <Segment>
                                             <Table size="small" basic="very" compact fixed>
                                                 <Table.Body basic="very">
-                                                    <Table.Row>
-                                                        <Table.Cell>Downpayment</Table.Cell>
-                                                        <Table.Cell textAlign="right">{this.state.gathering.downpayment}</Table.Cell>
-                                                    </Table.Row>
                                                     <Table.Row>
                                                         <Table.Cell>Status</Table.Cell>
                                                         <Table.Cell textAlign="right">{this.state.gathering.status}</Table.Cell>
                                                     </Table.Row>
                                                     <Table.Row>
-                                                        <Table.Cell>Downpayment</Table.Cell>
+                                                        <Table.Cell>Downpayment (ether)</Table.Cell>
                                                         <Table.Cell textAlign="right">{this.state.gathering.downpayment}</Table.Cell>
                                                     </Table.Row>
                                                 </Table.Body>
@@ -71,7 +71,7 @@ class GatheringsShowPage extends Component {
                                 </Sticky>
                             </Grid.Column>
                         </Ref>
-                        <Grid.Column width={12}>
+                        <Grid.Column width={11}>
                             <Header>Registrars</Header>
                             <Table>
                                 <Table.Header>
@@ -83,12 +83,13 @@ class GatheringsShowPage extends Component {
                                 </Table.Header>
                                 <Table.Body>
                                     {
-                                        this.state.participants.map((_, i) => {
+                                        this.state.participants.map((participant, i) => {
+                                            const signupDate = moment(parseInt(participant.signupDate));
                                             return (
                                                 <Table.Row key={i}>
-                                                    <Table.Cell>Jeshui Laskarov</Table.Cell>
-                                                    <Table.Cell>Today</Table.Cell>
-                                                    <Table.Cell>Yes</Table.Cell>
+                                                    <Table.Cell>{participant.name}</Table.Cell>
+                                                    <Table.Cell>{signupDate.format('MMMM D, yyyy')}</Table.Cell>
+                                                    <Table.Cell>{participant.attended ? "Yes" : "No"}</Table.Cell>
                                                 </Table.Row>
                                             );
                                         })
