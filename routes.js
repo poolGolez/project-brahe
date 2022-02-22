@@ -1,4 +1,4 @@
 const routes = require('next-routes');
 
 module.exports = routes()
-    .add('/gatherings/:address', '/gatherings/show')
+    .add('/gatherings/show/:address', '/gatherings/show')

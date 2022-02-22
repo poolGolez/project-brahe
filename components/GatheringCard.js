@@ -5,7 +5,7 @@ import { Card, Container, Icon, Statistic } from "semantic-ui-react";
 class GatheringCard extends Component {
     render() {
         return (
-            <Link href={`/gatherings/${this.props.address}`}>
+            <Link href={`/gatherings/show/${this.props.address}`}>
                 <Card>
                     <Card.Content>
                         <Card.Header>{this.props.header}</Card.Header>
