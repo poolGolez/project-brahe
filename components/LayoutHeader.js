@@ -5,7 +5,7 @@ class Header extends Component {
     render() {
         return (
             <Menu borderless>
-                <Menu.Item>
+                <Menu.Item href='/'>
                     <Image src='https://react.semantic-ui.com/logo.png' size='mini' />
                 </Menu.Item>
                 <Menu.Item header>
