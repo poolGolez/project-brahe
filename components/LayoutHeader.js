@@ -13,7 +13,7 @@ class Header extends Component {
                 </Menu.Item>
 
                 <Menu.Menu position='right'>
-                    <Menu.Item>
+                    <Menu.Item href='/gatherings/create'>
                         <Icon name="plus" />
                         Create Gathering
                     </Menu.Item>
