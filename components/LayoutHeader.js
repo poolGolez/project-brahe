@@ -1,5 +1,6 @@
 import { Component } from "react";
 import { Menu, Image, Icon } from "semantic-ui-react";
+import CreateGatheringModal from "./gathering/form";
 
 class Header extends Component {
     render() {
@@ -13,12 +14,15 @@ class Header extends Component {
                 </Menu.Item>
 
                 <Menu.Menu position='right'>
-                    <Menu.Item href='/gatherings/create'>
-                        <Icon name="plus" />
-                        Create Gathering
-                    </Menu.Item>
+                    <CreateGatheringModal
+                        trigger={
+                            <Menu.Item link>
+                                <Icon name="plus" />
+                                Create Gathering
+                            </Menu.Item>
+                        } />
                 </Menu.Menu>
-            </Menu>
+            </Menu >
         );
     }
 }
